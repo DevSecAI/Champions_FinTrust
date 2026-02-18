@@ -1,0 +1,35 @@
+# FinTrust CI - install deps, run tests, SAST (Security Champions training)
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install and test API
+        run: |
+          cd api && npm ci && npm test
+      - name: Install and test Web
+        run: |
+          cd web && npm ci && npm test -- --watchAll=false
+        continue-on-error: true
+
+      - name: SAST scan (AppThreat)
+        uses: AppThreat/sast-scan-action@v1
+        env:
+          SCAN_LANGUAGES: javascript,typescript
+        continue-on-error: true

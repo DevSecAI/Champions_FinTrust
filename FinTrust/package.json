@@ -1,0 +1,16 @@
+{
+  "name": "fintrust",
+  "private": true,
+  "description": "FinTrust Security Champions training platform",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "concurrently -n auth,api,web -c yellow,blue,green \"npm run dev:auth\" \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:auth": "cd auth && npm run start",
+    "dev:api": "cd api && npm run start",
+    "dev:web": "cd web && npm run start",
+    "install:all": "npm install && cd auth && npm install && cd ../api && npm install && cd ../web && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

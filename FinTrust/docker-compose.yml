@@ -1,0 +1,44 @@
+# FinTrust - DevSecAI Security Champions Training
+# All services communicate via internal Docker network.
+
+services:
+  web:
+    build: ./web
+    ports:
+      - "3000:3000"
+    environment:
+      # Browser runs on host; use localhost so JS can reach api/auth
+      - REACT_APP_API_URL=http://localhost:4000
+      - REACT_APP_AUTH_URL=http://localhost:5000
+    depends_on:
+      - api
+      - auth
+    networks:
+      - fintrust
+
+  api:
+    build: ./api
+    ports:
+      - "4000:4000"
+    environment:
+      - AUTH_SERVICE_URL=http://auth:5000
+      - NODE_ENV=development
+    depends_on:
+      - auth
+    networks:
+      - fintrust
+
+  auth:
+    build: ./auth
+    ports:
+      - "5000:5000"
+    environment:
+      # Use JWT_SECRET from .env if present; dev-only default for local runs only
+      - JWT_SECRET=${JWT_SECRET:-dev-local-only-not-for-production}
+      - NODE_ENV=development
+    networks:
+      - fintrust
+
+networks:
+  fintrust:
+    driver: bridge
