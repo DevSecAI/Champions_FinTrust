@@ -1,0 +1,30 @@
+# P78: Container image scan with Trivy (minimal base images + multi-stage builds).
+# Runs on Dockerfile changes and on demand.
+
+name: Container Scan
+
+on:
+  push:
+    paths: ['api/Dockerfile', 'auth/Dockerfile', 'web/Dockerfile', '.github/workflows/container-scan.yml']
+  pull_request:
+    paths: ['api/Dockerfile', 'auth/Dockerfile', 'web/Dockerfile', '.github/workflows/container-scan.yml']
+  workflow_dispatch:
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        context: [api, auth, web]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t fintrust-${{ matrix.context }}:scan ./${{ matrix.context }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'fintrust-${{ matrix.context }}:scan'
+          format: 'table'
+        continue-on-error: true

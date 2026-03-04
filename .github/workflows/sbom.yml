@@ -1,0 +1,30 @@
+# FinTrust SBOM - Syft generate + optional scan (Security Champions training)
+
+name: SBOM
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate SBOM (Syft)
+        uses: anchore/syft-action@v4
+        with:
+          path: .
+          output: sbom.spdx.json
+          format: spdx-json
+        continue-on-error: true
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.spdx.json
+        if: always()

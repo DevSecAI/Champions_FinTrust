@@ -232,7 +232,7 @@ function Transfer({ account, token }) {
   );
 }
 
-function PayBill({ account, token }) {
+function PayBill({ token }) {
   const [payee, setPayee] = useState('');
   const [amount, setAmount] = useState('');
   const [reference, setReference] = useState('');
